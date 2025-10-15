@@ -1,4 +1,7 @@
 package lol.hugoqdesh.kmdb.repositories;
 
-public interface ActorRepository {
+import lol.hugoqdesh.kmdb.entities.Actor;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface ActorRepository extends JpaRepository<Actor, Long> {
 }
