@@ -1,62 +1,96 @@
 package lol.hugoqdesh.kmdb.service;
 
+import lol.hugoqdesh.kmdb.dto.ActorResponseDTO;
+import lol.hugoqdesh.kmdb.dto.MovieRequestDTO;
+import lol.hugoqdesh.kmdb.dto.MovieResponseDTO;
 import lol.hugoqdesh.kmdb.entities.Actor;
 import lol.hugoqdesh.kmdb.entities.Genre;
 import lol.hugoqdesh.kmdb.entities.Movie;
+import lol.hugoqdesh.kmdb.exception.ResourceNotFoundException;
+import lol.hugoqdesh.kmdb.mapper.ActorMapper;
+import lol.hugoqdesh.kmdb.mapper.MovieMapper;
+import lol.hugoqdesh.kmdb.repositories.ActorRepository;
+import lol.hugoqdesh.kmdb.repositories.GenreRepository;
 import lol.hugoqdesh.kmdb.repositories.MovieRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class MovieService {
 
     private final MovieRepository movieRepository;
+    private final ActorRepository actorRepository;
+    private final GenreRepository genreRepository;
+    private final MovieMapper movieMapper;
+    private final ActorMapper actorMapper;
 
-    public MovieService(MovieRepository movieRepository) {
+    public MovieService(MovieRepository movieRepository, ActorRepository actorRepository, GenreRepository genreRepository, MovieMapper movieMapper, ActorMapper actorMapper) {
         this.movieRepository = movieRepository;
+        this.actorRepository = actorRepository;
+        this.genreRepository = genreRepository;
+        this.movieMapper = movieMapper;
+        this.actorMapper = actorMapper;
     }
 
-    public Movie createMovie(Long id, String title, Integer releaseYear, Integer duration, Set<Genre> genre, Set<Actor> actors) {
-        Movie movie = new Movie();
-        movie.setTitle(title);
-        movie.setReleaseYear(releaseYear);
-        movie.setDuration(duration);
-        movie.setGenres(genre);
+    public MovieResponseDTO createMovie(MovieRequestDTO dto) {
+        Set<Genre> genres = new HashSet<>(genreRepository.findAllById(dto.getGenreIds()));
+        Set<Actor> actors = new HashSet<>(actorRepository.findAllById(dto.getActorIds()));
+
+        Movie movie = movieMapper.toEntity(dto, genres, actors);
+        return movieMapper.toDTO(movieRepository.save(movie));
+    }
+
+    @Transactional
+    public List<MovieResponseDTO> getAllMovies() {
+        return movieRepository.findAll().stream().map(movieMapper::toDTO).collect(Collectors.toList());
+    }
+
+    @Transactional
+    public MovieResponseDTO getMovieById(Long id) {
+        Movie movie = movieRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Movie with id " + id + " not found"));
+        return movieMapper.toDTO(movie);
+    }
+
+    @Transactional
+    public List<MovieResponseDTO> getMovieByGenreId(Long genreId) {
+        Genre genre = genreRepository.findById(genreId).orElseThrow(() -> new ResourceNotFoundException("Genre with id " + genreId + " not found"));
+        return movieRepository.findByGenres(genre).stream().map(movieMapper::toDTO).collect(Collectors.toList());
+    }
+
+    @Transactional
+    public List<MovieResponseDTO> getMovieByReleaseYear(Integer releaseYear) {
+        return movieRepository.findByReleaseYear(releaseYear).stream().map(movieMapper::toDTO).collect(Collectors.toList());
+    }
+
+    @Transactional
+    public List<MovieResponseDTO> getMovieByActorId(Long actorId) {
+        Actor actor = actorRepository.findById(actorId).orElseThrow(() -> new ResourceNotFoundException("Actor with id " + actorId + " not found"));
+        return movieRepository.findByActors(actor).stream().map(movieMapper::toDTO).collect(Collectors.toList());
+    }
+
+    @Transactional
+    public List<ActorResponseDTO> getActorByMovieId(Long movieId) {
+        Movie movie = movieRepository.findById(movieId).orElseThrow(() -> new ResourceNotFoundException("Movie with id " + movieId + " not found"));
+        return movie.getActors().stream().map(actorMapper::toDTO).collect(Collectors.toList());
+    }
+
+    public MovieResponseDTO updateMovie(Long id, MovieRequestDTO dto) {
+        Movie movie = movieRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Movie with id " + id + " not found"));
+
+        Set<Genre> genres = new HashSet<>(genreRepository.findAllById(dto.getGenreIds()));
+        Set<Actor> actors = new HashSet<>(actorRepository.findAllById(dto.getActorIds()));
+
+        movie.setTitle(dto.getTitle());
+        movie.setReleaseYear(dto.getReleaseYear());
+        movie.setDuration(dto.getDuration());
+        movie.setGenres(genres);
         movie.setActors(actors);
-        return movieRepository.save(movie);
-    }
-
-    public List<Movie> getAllMovies() {
-        return movieRepository.findAll();
-    }
-
-    public Movie getMovieById(Long id) {
-        return movieRepository.findById(id).orElseThrow(() -> new RuntimeException("Genre with id " + id + " not found"));
-    }
-
-    public List<Movie> getMovieByGenre(String genre) {
-        return movieRepository.findByGenre(genre);
-    }
-
-    public List<Movie> getMovieByReleaseYear(Integer releaseYear) {
-        return movieRepository.findByReleaseYear(releaseYear);
-    }
-
-    public Set<Actor> getAllActorsByMovieId(Long movieId) {
-        Movie movie = movieRepository.findById(movieId).orElseThrow(() -> new RuntimeException("Actor with id " + movieId + " not found"));
-        return movie.getActors();
-    }
-
-    public Movie updateMovie(Long id, String title, Integer releaseYear, Integer duration, Set<Genre> genre, Set<Actor> actors) {
-        Movie movie = movieRepository.findById(id).orElseThrow(() -> new RuntimeException("Actor with id " + id + " not found"));
-        movie.setTitle(title);
-        movie.setReleaseYear(releaseYear);
-        movie.setDuration(duration);
-        movie.setGenres(genre);
-        movie.setActors(actors);
-        return movieRepository.save(movie);
+        return movieMapper.toDTO(movieRepository.save(movie));
     }
 
     public void deleteMovie(Long id) {

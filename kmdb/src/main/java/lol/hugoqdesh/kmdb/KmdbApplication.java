@@ -9,5 +9,4 @@ public class KmdbApplication {
     public static void main(String[] args) {
         SpringApplication.run(KmdbApplication.class, args);
     }
-
 }

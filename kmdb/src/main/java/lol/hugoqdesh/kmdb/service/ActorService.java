@@ -1,53 +1,67 @@
 package lol.hugoqdesh.kmdb.service;
 
+import lol.hugoqdesh.kmdb.dto.ActorRequestDTO;
+import lol.hugoqdesh.kmdb.dto.ActorResponseDTO;
 import lol.hugoqdesh.kmdb.entities.Actor;
 import lol.hugoqdesh.kmdb.entities.Movie;
+import lol.hugoqdesh.kmdb.exception.ResourceNotFoundException;
+import lol.hugoqdesh.kmdb.mapper.ActorMapper;
 import lol.hugoqdesh.kmdb.repositories.ActorRepository;
+import lol.hugoqdesh.kmdb.repositories.MovieRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class ActorService {
 
     private final ActorRepository actorRepository;
+    private final MovieRepository movieRepository;
+    private final ActorMapper actorMapper;
 
-    public ActorService(ActorRepository actorRepository) {
+    public ActorService(ActorRepository actorRepository, MovieRepository movieRepository, ActorMapper actorMapper) {
         this.actorRepository = actorRepository;
+        this.movieRepository = movieRepository;
+        this.actorMapper = actorMapper;
     }
 
-    public Actor createActor(String name, LocalDate birthDate) {
-        Actor actor = new Actor();
-        actor.setName(name);
-        actor.setBirthDate(birthDate);
-        return actorRepository.save(actor);
+    public ActorResponseDTO createActor(ActorRequestDTO dto) {
+        Set<Movie> movies = new HashSet<>(movieRepository.findAllById(dto.getMovieIds()));
+        Actor actor = actorMapper.toEntity(dto, movies);
+        return actorMapper.toDTO(actorRepository.save(actor));
     }
 
-    public List<Actor> getAllActors() {
-        return actorRepository.findAll();
+    @Transactional
+    public List<ActorResponseDTO> getAllActors() {
+        return actorRepository.findAll().stream().map(actorMapper::toDTO).collect(Collectors.toList());
     }
 
-    public Actor getActorById(Long id) {
-        return actorRepository.findById(id).orElseThrow(() -> new RuntimeException("Actor with id " + id + " not found"));
+    @Transactional
+    public ActorResponseDTO getActorById(Long id) {
+        Actor actor = actorRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Actor with id " + id + " not found"));
+        return actorMapper.toDTO(actor);
     }
 
-    public List<Actor> getActorsByName(String name) {
-        return actorRepository.findByName(name);
+    @Transactional
+    public List<ActorResponseDTO> getActorsByName(String name) {
+        return actorRepository.findByName(name).stream().map(actorMapper::toDTO).collect(Collectors.toList());
     }
 
-    public Set<Movie> getAllMoviesByActorId(Long actorId) {
-        Actor actor = actorRepository.findById(actorId).orElseThrow(() -> new RuntimeException("Actor with id " + actorId + " not found"));
-        return actor.getMovies();
-    }
+    @Transactional
+    public ActorResponseDTO updateActor(Long id, ActorRequestDTO dto) {
+        Actor actor = actorRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Actor with id " + id + " not found"));
 
-    public Actor updateActor(Long id, String name, LocalDate birthDate, Set<Movie> movies) {
-        Actor actor = actorRepository.findById(id).orElseThrow(() -> new RuntimeException("Actor with id " + id + " not found"));
-        actor.setName(name);
-        actor.setBirthDate(birthDate);
+        Set<Movie> movies = new HashSet<>(movieRepository.findAllById(dto.getMovieIds()));
+
+        actor.setName(dto.getName());
+        actor.setBirthDate(dto.getBirthDate());
         actor.setMovies(movies);
-        return actorRepository.save(actor);
+
+        return actorMapper.toDTO(actorRepository.save(actor));
     }
 
     public void deleteActorById(Long id) {

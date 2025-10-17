@@ -1,3 +1,17 @@
 spring:
   application:
     name: kmdb
+  datasource:
+    url: jdbc:sqlite:kmdb.db
+    driver-class-name: org.sqlite.JDBC
+
+  sql:
+    init:
+      mode: always
+
+  jpa:
+    database-platform: org.hibernate.community.dialect.SQLiteDialect
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+    open-in-view: false
