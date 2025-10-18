@@ -46,7 +46,19 @@ public class GenreService {
         return genreMapper.toDTO(genre);
     }
 
-    public void deleteGenreById(Long id) {
-        genreRepository.deleteById(id);
+    @Transactional
+    public void deleteGenreById(Long id, boolean force) {
+        Genre genre = genreRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Genre with id " + id + " not found"));
+
+        if (!force && !genre.getMovies().isEmpty()) {
+            throw new IllegalStateException("Cannot delete genre '" + genre.getName() + "' because it has " + genre.getMovies().size() + " associated movies.");
+        }
+
+        if (force) {
+            genre.getMovies().forEach(movie -> movie.getGenres().remove(genre));
+        }
+
+        genreRepository.delete(genre);
     }
+
 }

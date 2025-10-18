@@ -44,8 +44,13 @@ public class ActorController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteActorById(@PathVariable Long id) {
-        actorService.deleteActorById(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<?> deleteActor(@PathVariable Long id,
+                                         @RequestParam(defaultValue = "false") boolean force) {
+        try {
+            actorService.deleteActorById(id, force);
+            return ResponseEntity.noContent().build();
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
 }

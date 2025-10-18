@@ -64,7 +64,19 @@ public class ActorService {
         return actorMapper.toDTO(actorRepository.save(actor));
     }
 
-    public void deleteActorById(Long id) {
-        actorRepository.deleteById(id);
+    @Transactional
+    public void deleteActorById(Long id, boolean force) {
+        Actor actor = actorRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Actor with id " + id + " not found"));
+
+        if (!force && !actor.getMovies().isEmpty()) {
+            throw new IllegalStateException("Unable to delete actor '" + actor.getName() + "' as they are associated with " + actor.getMovies().size() + " movies.");
+        }
+
+        if (force) {
+            actor.getMovies().forEach(movie -> movie.getActors().remove(actor));
+        }
+
+        actorRepository.delete(actor);
     }
+
 }
