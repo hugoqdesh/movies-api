@@ -26,7 +26,7 @@ public class MovieController {
     }
 
     @GetMapping
-    public ResponseEntity<List<MovieResponseDTO>> getAllMovies(@RequestParam(required = false) Long genre, @RequestParam(required = false) Integer year, @RequestParam(required = false) Long actor) {
+    public ResponseEntity<?> getAllMovies(@RequestParam(required = false) Long genre, @RequestParam(required = false) Integer year, @RequestParam(required = false) Long actor, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
 
         if(genre != null) {
             return ResponseEntity.ok(movieService.getMovieByGenreId(genre));
@@ -38,7 +38,7 @@ public class MovieController {
             return ResponseEntity.ok(movieService.getMovieByActorId(actor));
         }
 
-        return ResponseEntity.ok(movieService.getAllMovies());
+        return ResponseEntity.ok(movieService.getAllMovies(page, size));
     }
 
     @GetMapping("/{id}")
@@ -49,6 +49,11 @@ public class MovieController {
     @GetMapping("/{movieId}/actors")
     public ResponseEntity<List<ActorResponseDTO>> getActorsByMovieId(@PathVariable Long movieId) {
         return ResponseEntity.ok(movieService.getActorByMovieId(movieId));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<MovieResponseDTO>> searchMovies(@RequestParam String title) {
+        return ResponseEntity.ok(movieService.searchMoviesByTitle(title));
     }
 
     @PatchMapping("/{id}")

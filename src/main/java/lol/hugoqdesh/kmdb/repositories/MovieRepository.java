@@ -3,6 +3,8 @@ package lol.hugoqdesh.kmdb.repositories;
 import lol.hugoqdesh.kmdb.entities.Actor;
 import lol.hugoqdesh.kmdb.entities.Genre;
 import lol.hugoqdesh.kmdb.entities.Movie;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -14,4 +16,8 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
     List<Movie> findByReleaseYear(Integer releaseYear);
 
     List<Movie> findByActors(Actor actor);
+
+    Page<Movie> findAll(Pageable pageable);
+
+    List<Movie> searchByTitle(String title);
 }

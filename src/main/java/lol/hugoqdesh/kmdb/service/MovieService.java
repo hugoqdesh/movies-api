@@ -12,6 +12,9 @@ import lol.hugoqdesh.kmdb.mapper.MovieMapper;
 import lol.hugoqdesh.kmdb.repositories.ActorRepository;
 import lol.hugoqdesh.kmdb.repositories.GenreRepository;
 import lol.hugoqdesh.kmdb.repositories.MovieRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,8 +49,9 @@ public class MovieService {
     }
 
     @Transactional
-    public List<MovieResponseDTO> getAllMovies() {
-        return movieRepository.findAll().stream().map(movieMapper::toDTO).collect(Collectors.toList());
+    public Page<MovieResponseDTO> getAllMovies(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return movieRepository.findAll(pageable).map(movieMapper::toDTO);
     }
 
     @Transactional
@@ -95,5 +99,10 @@ public class MovieService {
 
     public void deleteMovie(Long id) {
         movieRepository.deleteById(id);
+    }
+
+    @Transactional
+    public List<MovieResponseDTO> searchMoviesByTitle(String title) {
+        return movieRepository.searchByTitle(title).stream().map(movieMapper::toDTO).collect(Collectors.toList());
     }
 }
