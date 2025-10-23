@@ -32,7 +32,12 @@ public class MovieService {
     private final MovieMapper movieMapper;
     private final ActorMapper actorMapper;
 
-    public MovieService(MovieRepository movieRepository, ActorRepository actorRepository, GenreRepository genreRepository, MovieMapper movieMapper, ActorMapper actorMapper) {
+    public MovieService(MovieRepository movieRepository,
+                        ActorRepository actorRepository,
+                        GenreRepository genreRepository,
+                        MovieMapper movieMapper,
+                        ActorMapper actorMapper) {
+
         this.movieRepository = movieRepository;
         this.actorRepository = actorRepository;
         this.genreRepository = genreRepository;
@@ -50,37 +55,64 @@ public class MovieService {
 
     @Transactional
     public Page<MovieResponseDTO> getAllMovies(int page, int size) {
+        if (page < 0) {
+            throw new ResourceNotFoundException("Page index must not be less than zero");
+        }
+        if (size <= 0 || size > 100) {
+            throw new ResourceNotFoundException("Page size must be between 1 and 100");
+        }
+
         Pageable pageable = PageRequest.of(page, size);
         return movieRepository.findAll(pageable).map(movieMapper::toDTO);
     }
 
     @Transactional
     public MovieResponseDTO getMovieById(Long id) {
-        Movie movie = movieRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Movie with id " + id + " not found"));
+        Movie movie = movieRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Movie with id " + id + " not found"));
+
         return movieMapper.toDTO(movie);
     }
 
     @Transactional
     public List<MovieResponseDTO> getMovieByGenreId(Long genreId) {
-        Genre genre = genreRepository.findById(genreId).orElseThrow(() -> new ResourceNotFoundException("Genre with id " + genreId + " not found"));
-        return movieRepository.findByGenres(genre).stream().map(movieMapper::toDTO).collect(Collectors.toList());
+        Genre genre = genreRepository.findById(genreId)
+                .orElseThrow(() -> new ResourceNotFoundException("Genre with id " + genreId + " not found"));
+
+        return movieRepository.findByGenres(genre)
+                .stream()
+                .map(movieMapper::toDTO)
+                .collect(Collectors.toList());
     }
 
     @Transactional
     public List<MovieResponseDTO> getMovieByReleaseYear(Integer releaseYear) {
-        return movieRepository.findByReleaseYear(releaseYear).stream().map(movieMapper::toDTO).collect(Collectors.toList());
+        return movieRepository.findByReleaseYear(releaseYear)
+                .stream()
+                .map(movieMapper::toDTO)
+                .collect(Collectors.toList());
     }
 
     @Transactional
     public List<MovieResponseDTO> getMovieByActorId(Long actorId) {
-        Actor actor = actorRepository.findById(actorId).orElseThrow(() -> new ResourceNotFoundException("Actor with id " + actorId + " not found"));
-        return movieRepository.findByActors(actor).stream().map(movieMapper::toDTO).collect(Collectors.toList());
+        Actor actor = actorRepository.findById(actorId)
+                .orElseThrow(() -> new ResourceNotFoundException("Actor with id " + actorId + " not found"));
+
+        return movieRepository.findByActors(actor)
+                .stream()
+                .map(movieMapper::toDTO)
+                .collect(Collectors.toList());
     }
 
     @Transactional
     public List<ActorResponseDTO> getActorByMovieId(Long movieId) {
-        Movie movie = movieRepository.findById(movieId).orElseThrow(() -> new ResourceNotFoundException("Movie with id " + movieId + " not found"));
-        return movie.getActors().stream().map(actorMapper::toDTO).collect(Collectors.toList());
+        Movie movie = movieRepository.findById(movieId)
+                .orElseThrow(() -> new ResourceNotFoundException("Movie with id " + movieId + " not found"));
+
+        return movie.getActors()
+                .stream()
+                .map(actorMapper::toDTO)
+                .collect(Collectors.toList());
     }
 
     public MovieResponseDTO updateMovie(Long id, MovieRequestDTO dto) {
@@ -103,6 +135,12 @@ public class MovieService {
 
     @Transactional
     public List<MovieResponseDTO> searchMoviesByTitle(String title) {
-        return movieRepository.searchByTitle(title).stream().map(movieMapper::toDTO).collect(Collectors.toList());
+        String lowercaseTitle = title.toLowerCase();
+
+        return movieRepository.findAll()
+                .stream()
+                .filter(movie -> movie.getTitle() != null && movie.getTitle().toLowerCase().contains(lowercaseTitle))
+                .map(movieMapper::toDTO)
+                .collect(Collectors.toList());
     }
 }

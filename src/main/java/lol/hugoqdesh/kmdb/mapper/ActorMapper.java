@@ -18,7 +18,7 @@ public class ActorMapper {
         dto.setName(actor.getName());
         dto.setBirthDate(actor.getBirthDate());
 
-        dto.setMovies(actor.getMovies().stream().map(Movie::getTitle) .collect(Collectors.toSet()));
+        dto.setMovies(actor.getMovies().stream().map(Movie::getTitle).collect(Collectors.toSet()));
 
         return dto;
     }

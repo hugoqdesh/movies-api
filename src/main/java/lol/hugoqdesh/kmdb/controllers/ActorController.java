@@ -1,5 +1,6 @@
 package lol.hugoqdesh.kmdb.controllers;
 
+import jakarta.validation.Valid;
 import lol.hugoqdesh.kmdb.dto.ActorRequestDTO;
 import lol.hugoqdesh.kmdb.dto.ActorResponseDTO;
 import lol.hugoqdesh.kmdb.service.ActorService;
@@ -20,7 +21,7 @@ public class ActorController {
     }
 
     @PostMapping
-    public ResponseEntity<ActorResponseDTO> createActor(@RequestBody ActorRequestDTO dto) {
+    public ResponseEntity<ActorResponseDTO> createActor(@Valid @RequestBody ActorRequestDTO dto) {
         return new ResponseEntity<>(actorService.createActor(dto), HttpStatus.CREATED);
     }
 
@@ -44,8 +45,7 @@ public class ActorController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteActor(@PathVariable Long id,
-                                         @RequestParam(defaultValue = "false") boolean force) {
+    public ResponseEntity<?> deleteActor(@PathVariable Long id, @RequestParam(defaultValue = "false") boolean force) {
         try {
             actorService.deleteActorById(id, force);
             return ResponseEntity.noContent().build();

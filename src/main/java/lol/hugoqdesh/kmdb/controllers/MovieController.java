@@ -1,5 +1,6 @@
 package lol.hugoqdesh.kmdb.controllers;
 
+import jakarta.validation.Valid;
 import lol.hugoqdesh.kmdb.dto.ActorResponseDTO;
 import lol.hugoqdesh.kmdb.dto.MovieRequestDTO;
 import lol.hugoqdesh.kmdb.dto.MovieResponseDTO;
@@ -21,7 +22,7 @@ public class MovieController {
     }
 
     @PostMapping
-    public ResponseEntity<MovieResponseDTO> createMovie(@RequestBody MovieRequestDTO dto) {
+    public ResponseEntity<MovieResponseDTO> createMovie(@Valid @RequestBody MovieRequestDTO dto) {
         return new ResponseEntity<>(movieService.createMovie(dto), HttpStatus.CREATED);
     }
 

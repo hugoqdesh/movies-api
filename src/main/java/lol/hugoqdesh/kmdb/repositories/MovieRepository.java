@@ -18,6 +18,4 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
     List<Movie> findByActors(Actor actor);
 
     Page<Movie> findAll(Pageable pageable);
-
-    List<Movie> searchByTitle(String title);
 }

@@ -1,5 +1,6 @@
 package lol.hugoqdesh.kmdb.controllers;
 
+import jakarta.validation.Valid;
 import lol.hugoqdesh.kmdb.dto.GenreRequestDTO;
 import lol.hugoqdesh.kmdb.dto.GenreResponseDTO;
 import lol.hugoqdesh.kmdb.service.GenreService;
@@ -20,7 +21,7 @@ public class GenreController {
     }
 
     @PostMapping
-    public ResponseEntity<GenreResponseDTO> createGenre(@RequestBody GenreRequestDTO dto) {
+    public ResponseEntity<GenreResponseDTO> createGenre(@Valid @RequestBody GenreRequestDTO dto) {
         return new ResponseEntity<>(genreService.createGenre(dto), HttpStatus.CREATED);
     }
 

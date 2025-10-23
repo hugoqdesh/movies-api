@@ -30,25 +30,33 @@ public class GenreService {
 
     @Transactional
     public List<GenreResponseDTO> getAllGenres() {
-        return genreRepository.findAll().stream().map(genreMapper::toDTO).collect(Collectors.toList());
+        return genreRepository.findAll()
+                .stream()
+                .map(genreMapper::toDTO)
+                .collect(Collectors.toList());
     }
 
     @Transactional
     public GenreResponseDTO getGenreById(Long id) {
-        Genre genre = genreRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Genre with id " + id + " not found"));
-        return  genreMapper.toDTO(genre);
+        Genre genre = genreRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Genre with id " + id + " not found"));
+
+        return genreMapper.toDTO(genre);
     }
 
     @Transactional
     public GenreResponseDTO updateGenre(Long id, GenreRequestDTO dto) {
-        Genre genre = genreRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Genre with id " + id + " not found"));
+        Genre genre = genreRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Genre with id " + id + " not found"));
+
         genre.setName(dto.getName());
         return genreMapper.toDTO(genre);
     }
 
     @Transactional
     public void deleteGenreById(Long id, boolean force) {
-        Genre genre = genreRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Genre with id " + id + " not found"));
+        Genre genre = genreRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Genre with id " + id + " not found"));
 
         if (!force && !genre.getMovies().isEmpty()) {
             throw new IllegalStateException("Cannot delete genre '" + genre.getName() + "' because it has " + genre.getMovies().size() + " associated movies.");
@@ -60,5 +68,4 @@ public class GenreService {
 
         genreRepository.delete(genre);
     }
-
 }
