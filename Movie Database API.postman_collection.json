@@ -1,0 +1,204 @@
+{
+	"info": {
+		"_postman_id": "879066c1-ba72-45a1-9ccd-f2853d11a9ef",
+		"name": "Movie Database API",
+		"description": "### Welcome to Postman! This is your first collection.\n\nCollections are your starting point for building and testing APIs. You can use this one to:\n\n• Group related requests  \n• Test your API in real-world scenarios  \n• Document and share your requests\n\nUpdate the name and overview whenever you’re ready to make it yours.\n\n[Learn more about Postman Collections.](https://learning.postman.com/docs/collections/collections-overview/)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "49321064",
+		"_collection_link": "https://johandm7-2018680.postman.co/workspace/Huge's-Workspace~10346df3-0715-48a6-87c4-1557b1c1d883/collection/49321064-879066c1-ba72-45a1-9ccd-f2853d11a9ef?action=share&source=collection_link&creator=49321064"
+	},
+	"item": [
+		{
+			"name": "Post Genre",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"Thriller\"\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:8080/api/genres"
+			},
+			"response": []
+		},
+		{
+			"name": "Post Movie",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"title\": \"Bla Bla 5\",\n  \"releaseYear\": 2005,\n  \"duration\": 160,\n  \"actorIds\": [2],\n  \"genreIds\": [2]\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:8080/api/movies"
+			},
+			"response": []
+		},
+		{
+			"name": "Post Actor",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"Christian Bale\",\n  \"birthDate\": \"1974-01-30\",\n  \"movieIds\": [1, 2]\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:8080/api/actors"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Genre",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:8080/api/genres/2"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Movie",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/movies/search?title",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"movies",
+						"search"
+					],
+					"query": [
+						{
+							"key": "title",
+							"value": null
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Actor",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://localhost:8080/api/actors"
+			},
+			"response": []
+		},
+		{
+			"name": "Patch Genre",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"new\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:8080/api/genres/1"
+			},
+			"response": []
+		},
+		{
+			"name": "Patch Movie",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"title\": \"Inception 2\",\n  \"releaseYear\": 2010,\n  \"duration\": 148,\n  \"actorIds\": [1],\n  \"genreIds\": [1]\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:8080/api/movies/1"
+			},
+			"response": []
+		},
+		{
+			"name": "Patch Actor",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"Updated Actor Name\",\n  \"birthDate\": \"1970-05-10\",\n  \"movieIds\": [1, 2]\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:8080/api/actors/1"
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Genre",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": "http://localhost:8080/api/genres/1"
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Movie",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": "http://localhost:8080/api/movies/1"
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Actor",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": "http://localhost:8080/api/actors/1"
+			},
+			"response": []
+		}
+	]
+}

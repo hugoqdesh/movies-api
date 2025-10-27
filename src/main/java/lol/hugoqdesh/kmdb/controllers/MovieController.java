@@ -63,8 +63,13 @@ public class MovieController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteMovieById(@PathVariable Long id) {
-        movieService.deleteMovie(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<?> deleteMovieById(@PathVariable Long id,  @RequestParam(defaultValue = "false") boolean force) {
+        try {
+            movieService.deleteMovie(id, force);
+            return ResponseEntity.noContent().build();
+
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
 }

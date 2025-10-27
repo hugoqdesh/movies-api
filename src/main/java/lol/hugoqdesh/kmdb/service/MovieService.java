@@ -58,6 +58,7 @@ public class MovieService {
         if (page < 0) {
             throw new ResourceNotFoundException("Page index must not be less than zero");
         }
+
         if (size <= 0 || size > 100) {
             throw new ResourceNotFoundException("Page size must be between 1 and 100");
         }
@@ -76,10 +77,7 @@ public class MovieService {
 
     @Transactional
     public List<MovieResponseDTO> getMovieByGenreId(Long genreId) {
-        Genre genre = genreRepository.findById(genreId)
-                .orElseThrow(() -> new ResourceNotFoundException("Genre with id " + genreId + " not found"));
-
-        return movieRepository.findByGenres(genre)
+        return movieRepository.findByGenresId(genreId)
                 .stream()
                 .map(movieMapper::toDTO)
                 .collect(Collectors.toList());
@@ -129,7 +127,18 @@ public class MovieService {
         return movieMapper.toDTO(movieRepository.save(movie));
     }
 
-    public void deleteMovie(Long id) {
+    @Transactional
+    public void deleteMovie(Long id, boolean force) {
+        Movie movie = movieRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Movie with id " + id + " not found"));
+
+        if(!force && !movie.getActors().isEmpty()) {
+            throw new ResourceNotFoundException("Unable to delete movie '" + movie.getTitle() + "' as they are associated with " + movie.getActors().size() + " actors");
+        }
+
+        if (force) {
+            movie.getActors().forEach(actor -> movie.getActors().remove(actor));
+        }
+
         movieRepository.deleteById(id);
     }
 
