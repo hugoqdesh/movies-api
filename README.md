@@ -33,6 +33,8 @@ RESTful API for retrieving and managing movie data using Spring Boot
 
 This section provides a detailed guide for interacting with the Movie Database API, including how to create, retrieve, update, delete, and filter data related to **Genres**, **Movies**, and **Actors**.
 
+You can visit http://localhost:8080 or use something like Postman:
+
 ### Base URL
 ```
 http://localhost:8080/api
