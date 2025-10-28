@@ -113,18 +113,32 @@ public class MovieService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public MovieResponseDTO updateMovie(Long id, MovieRequestDTO dto) {
-        Movie movie = movieRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Movie with id " + id + " not found"));
+        Movie movie = movieRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Movie with id " + id + " not found"));
 
-        Set<Genre> genres = new HashSet<>(genreRepository.findAllById(dto.getGenreIds()));
-        Set<Actor> actors = new HashSet<>(actorRepository.findAllById(dto.getActorIds()));
+        if (dto.getTitle() != null) {
+            movie.setTitle(dto.getTitle());
+        }
+        if (dto.getReleaseYear() != null) {
+            movie.setReleaseYear(dto.getReleaseYear());
+        }
+        if (dto.getGenreIds() != null) {
+            movie.setDuration(dto.getDuration());
+        }
 
-        movie.setTitle(dto.getTitle());
-        movie.setReleaseYear(dto.getReleaseYear());
-        movie.setDuration(dto.getDuration());
-        movie.setGenres(genres);
-        movie.setActors(actors);
-        return movieMapper.toDTO(movieRepository.save(movie));
+        if (dto.getGenreIds() != null && !dto.getGenreIds().isEmpty()) {
+            Set<Genre> genres = new HashSet<>(genreRepository.findAllById(dto.getGenreIds()));
+            movie.setGenres(genres);
+        }
+        if (dto.getActorIds() != null && !dto.getActorIds().isEmpty()) {
+            Set<Actor> actors = new HashSet<>(actorRepository.findAllById(dto.getActorIds()));
+            movie.setActors(actors);
+        }
+
+        Movie updatedMovie = movieRepository.save(movie);
+        return movieMapper.toDTO(updatedMovie);
     }
 
     @Transactional
